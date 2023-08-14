@@ -1,0 +1,3 @@
+# Testing Integrations
+
+For information on testing integrations see:
