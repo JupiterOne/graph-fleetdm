@@ -14,8 +14,8 @@ jobs:
       - name: Check out target branch questions
         uses: actions/checkout@v3
         with:
-          ref: $
-          repository: $
+          ref: ${{ github.event.pull_request.head.ref }}}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           path: target
 
       - id: setup-node

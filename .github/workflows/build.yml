@@ -39,8 +39,8 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-          token: $
+          fetch-depth: 2
+          token: ${{ secrets.AUTO_GITHUB_PAT_TOKEN }}
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -49,5 +49,5 @@ jobs:
       - name: Build and Release
         uses: jupiterone/action-npm-build-release@v1
         with:
-          npm_auth_token: $
-          gh_token: $
+          npm_auth_token: ${{ secrets.NPM_AUTH_TOKEN }}
+          gh_token: ${{ secrets.AUTO_GITHUB_PAT_TOKEN }}
