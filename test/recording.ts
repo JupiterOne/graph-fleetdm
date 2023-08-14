@@ -4,6 +4,8 @@ import {
   SetupRecordingInput,
   mutations,
 } from '@jupiterone/integration-sdk-testing';
+import { FleetDMHost, LoginResponse } from '../src/types';
+import { randomUUID } from 'crypto';
 
 export { Recording };
 
@@ -14,27 +16,36 @@ export function setupProjectRecording(
     ...input,
     redactedRequestHeaders: ['Authorization'],
     redactedResponseHeaders: ['set-cookie'],
-    mutateEntry: mutations.unzipGzippedRecordingEntry,
-    /*mutateEntry: (entry) => {
-      redact(entry);
-    },*/
+    mutateEntry: (entry) => redact(entry),
   });
 }
 
 // a more sophisticated redaction example below:
 
-/*
-function getRedactedOAuthResponse() {
-  return {
-    access_token: '[REDACTED]',
-    expires_in: 9999,
-    token_type: 'Bearer',
+function getRedactedLoginResponse() {
+  const response: LoginResponse = {
+    user: {
+      id: 1,
+      name: 'sample user',
+      email: 'sample@userland.net',
+      global_role: 'admin',
+      teams: [],
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z',
+      api_only: true,
+    },
+    token: '[REDACTED]',
+    message: '',
+    available_teams: [],
   };
+  return response;
 }
 
 function redact(entry): void {
   if (entry.request.postData) {
-    entry.request.postData.text = '[REDACTED]';
+    if (entry.request.url.match(/login/)) {
+      entry.request.postData.text = '[REDACTED]';
+    }
   }
 
   if (!entry.response.content.text) {
@@ -44,31 +55,24 @@ function redact(entry): void {
   //let's unzip the entry so we can modify it
   mutations.unzipGzippedRecordingEntry(entry);
 
-  //we can just get rid of all response content if this was the token call
-  const requestUrl = entry.request.url;
-  if (requestUrl.match(/oauth\/token/)) {
-    entry.response.content.text = JSON.stringify(getRedactedOAuthResponse());
+  if (entry.request.url.match(/login/)) {
+    entry.response.content.text = JSON.stringify(getRedactedLoginResponse());
     return;
   }
 
-  //if it wasn't a token call, parse the response text, removing any carriage returns or newlines
-  const responseText = entry.response.content.text;
-  const parsedResponseText = JSON.parse(responseText.replace(/\r?\n|\r/g, ''));
-
-  //now we can modify the returned object as desired
-  //in this example, if the return text is an array of objects that have the 'tenant' property...
-  if (parsedResponseText[0]?.tenant) {
-    for (let i = 0; i < parsedResponseText.length; i++) {
-      parsedResponseText[i].client_secret = '[REDACTED]';
-      parsedResponseText[i].jwt_configuration = '[REDACTED]';
-      parsedResponseText[i].signing_keys = '[REDACTED]';
-      parsedResponseText[i].encryption_key = '[REDACTED]';
-      parsedResponseText[i].addons = '[REDACTED]';
-      parsedResponseText[i].client_metadata = '[REDACTED]';
-      parsedResponseText[i].mobile = '[REDACTED]';
-      parsedResponseText[i].native_social_login = '[REDACTED]';
-    }
+  if (entry.request.url.match(/hosts/)) {
+    const hosts: FleetDMHost[] = JSON.parse(entry.response.content.text).hosts;
+    hosts.forEach((_, i) => {
+      hosts[i].uuid = randomUUID();
+      hosts[i].hardware_serial = `SERIAL${i}`;
+      hosts[i].public_ip = `127.0.0.1`;
+      hosts[i].primary_ip = `127.0.0.1`;
+      hosts[i].primary_mac = `00:00:00:00:00:00`;
+      hosts[i].display_text = `display${i}`;
+      hosts[i].display_name = `display${i}`;
+      hosts[i].computer_name = `name${i}`;
+      hosts[i].hostname = `host${i}`;
+    });
+    entry.response.content.text = JSON.stringify({ hosts });
   }
-
-  entry.response.content.text = JSON.stringify(parsedResponseText);
-} */
+}

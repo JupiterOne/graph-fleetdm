@@ -17,7 +17,9 @@ export const integrationConfig: IntegrationConfig = {
   hostname: process.env.HOSTNAME || 'fleetdm.testdomain.net',
 };
 
-export function buildStepTestConfigForStep(stepId: string): StepTestConfig {
+export function buildStepTestConfigForStep(
+  stepId: string,
+): StepTestConfig<IntegrationInvocationConfig, IntegrationConfig> {
   return {
     stepId,
     instanceConfig: integrationConfig,

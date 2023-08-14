@@ -18,6 +18,7 @@ export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
  */
 export class APIClient {
   private _gaxios: Gaxios;
+  private _verified: boolean = false;
   private logger?: IntegrationLogger;
   constructor(readonly config: IntegrationConfig, logger?: IntegrationLogger) {
     this.logger = logger;
@@ -27,6 +28,7 @@ export class APIClient {
   }
 
   public async verifyAuthentication(): Promise<void> {
+    if (this._verified) return;
     const { status, data } = await this._gaxios.request<LoginResponse>({
       url: '/login',
       method: 'POST',
@@ -49,6 +51,7 @@ export class APIClient {
       };
 
       this.logger?.info({ data }, 'Successfully authenticated');
+      this._verified = true;
     } else {
       throw new IntegrationProviderAuthenticationError({
         endpoint: '/login',

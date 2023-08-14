@@ -28,7 +28,8 @@ jobs:
       - name: Bump integration deployment version
         uses: JupiterOne/integration-github-actions/create-integration-deployment@v1
         with:
-          integrationName: ${{ steps.get-integration-name.outputs.integrationName}}
+          integrationName:
+            ${{ steps.get-integration-name.outputs.integrationName}}
           releaseNotes: ${{ github.event.release.body }}
           version: ${{ steps.get-version-number.outputs.versionNumber }}}
           githubToken: ${{ secrets.AUTO_GITHUB_PAT_TOKEN }}

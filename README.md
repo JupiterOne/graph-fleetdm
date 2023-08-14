@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# graph-fleetdm
-A graph conversion tool for https://fleetdm.com
-=======
-# JupiterOne Integration
+# JupiterOne FleetDM Integration
 
 Learn about the data ingested, benefits of this integration, and how to use it
 with JupiterOne in the [integration documentation](docs/jupiterone.md).
@@ -116,4 +112,3 @@ different naming conventions).
 We are not currently using the functionality for auto to update the CHANGELOG.
 As such, please remember to update CHANGELOG.md with the appropriate version,
 date, and changes.
->>>>>>> c3e021a (initial api client and entities)

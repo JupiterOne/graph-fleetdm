@@ -16,6 +16,7 @@
     "node": ">=18.0.0 <19.x"
   },
   "scripts": {
+    "clean": "rm -fr src/steps/**/__recordings__",
     "start": "j1-integration collect",
     "graph": "j1-integration visualize",
     "graph:types": "j1-integration visualize-types",
