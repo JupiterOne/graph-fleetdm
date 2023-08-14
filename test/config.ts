@@ -14,7 +14,7 @@ if (process.env.LOAD_ENV) {
 export const integrationConfig: IntegrationConfig = {
   username: process.env.USERNAME || 'test.username@testdomain.net',
   password: process.env.PASSWORD || 'test.password',
-  hostname: process.env.HOSTNAME || 'fleetdm.testdomain.net',
+  hostname: process.env.HOSTNAME || 'fleetdm.dev.jupiterone.io', // this has to match for recordings
 };
 
 export function buildStepTestConfigForStep(

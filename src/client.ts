@@ -23,12 +23,13 @@ export class APIClient {
   constructor(readonly config: IntegrationConfig, logger?: IntegrationLogger) {
     this.logger = logger;
     this._gaxios = new Gaxios({
+      timeout: 15_000, // 15 secs max
       baseURL: `https://${config.hostname}/api/v1/fleet`,
     });
   }
 
   public async verifyAuthentication(): Promise<void> {
-    if (this._verified) return;
+    if (this._verified) return Promise.resolve();
     const { status, data } = await this._gaxios.request<LoginResponse>({
       url: '/login',
       method: 'POST',
