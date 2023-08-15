@@ -1,16 +1,19 @@
 import { parseConfig } from './config';
 describe('parseConfig', () => {
-  const defaults = { username: 'yo', password: 'oy' };
+  const defaults = {
+    fleetdm_user_email: 'yo@yo.yo',
+    fleetdm_user_password: 'oy.oy@oy',
+  };
 
   test('should preserve plain hostname', () => {
     expect(
       parseConfig({
         ...defaults,
-        hostname: 'fleetdm.boogersugar.com',
+        fleetdm_hostname: 'fleetdm.boogersugar.com',
       }),
     ).toEqual({
       ...defaults,
-      hostname: 'fleetdm.boogersugar.com',
+      fleetdm_hostname: 'fleetdm.boogersugar.com',
     });
   });
 
@@ -18,11 +21,11 @@ describe('parseConfig', () => {
     expect(
       parseConfig({
         ...defaults,
-        hostname: 'fleetdm.boogersugar.com/',
+        fleetdm_hostname: 'fleetdm.boogersugar.com/',
       }),
     ).toEqual({
       ...defaults,
-      hostname: 'fleetdm.boogersugar.com',
+      fleetdm_hostname: 'fleetdm.boogersugar.com',
     });
   });
 
@@ -30,11 +33,11 @@ describe('parseConfig', () => {
     expect(
       parseConfig({
         ...defaults,
-        hostname: 'https://fleetdm.boogersugar.com',
+        fleetdm_hostname: 'https://fleetdm.boogersugar.com',
       }),
     ).toEqual({
       ...defaults,
-      hostname: 'fleetdm.boogersugar.com',
+      fleetdm_hostname: 'fleetdm.boogersugar.com',
     });
   });
 });

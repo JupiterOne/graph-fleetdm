@@ -24,7 +24,7 @@ export class APIClient {
     this.logger = logger;
     this._gaxios = new Gaxios({
       timeout: 15_000, // 15 secs max
-      baseURL: `https://${config.hostname}/api/v1/fleet`,
+      baseURL: `https://${config.fleetdm_hostname}/api/v1/fleet`,
     });
   }
 
@@ -33,7 +33,10 @@ export class APIClient {
     const { status, data } = await this._gaxios.request<LoginResponse>({
       url: '/login',
       method: 'POST',
-      data: { email: this.config.username, password: this.config.password },
+      data: {
+        email: this.config.fleetdm_user_email,
+        password: this.config.fleetdm_user_password,
+      },
     });
 
     if (status == 200) {
@@ -69,7 +72,7 @@ export class APIClient {
       url: '/config',
     });
 
-    // potentially exposes something secret
+    // potentially exposes secrets, hide from rawData
     delete data.smtp_settings;
 
     return data;
@@ -81,7 +84,7 @@ export class APIClient {
     const per_page = 250;
     const MAX_PAGES = 10000;
 
-    for (let page = 0; page < MAX_PAGES; page++) {
+    for (let page = 0; page <= MAX_PAGES; page++) {
       const { data } = await this._gaxios.request<{ hosts: FleetDMHost[] }>({
         url: '/hosts',
         params: { page, per_page },
@@ -89,6 +92,12 @@ export class APIClient {
 
       if (data.hosts.length === 0) break;
       await Promise.all(data.hosts.map(iteratee));
+      if (page === MAX_PAGES) {
+        this.logger?.warn(
+          { page, per_page },
+          'Max pages reached, stopping iteration',
+        );
+      }
     }
   }
 }
@@ -100,7 +109,7 @@ export function createAPIClient(
   logger?: IntegrationLogger,
 ): APIClient {
   const config = parseConfig(_config);
-  const _key = `${config.hostname}:${config.username}`;
+  const _key = `${config.fleetdm_hostname}:${config.fleetdm_user_email}`;
 
   if (!API_CLIENTS.has(_key)) {
     API_CLIENTS.set(_key, new APIClient(config, logger));

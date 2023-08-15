@@ -7,24 +7,24 @@ import {
 import { createAPIClient } from './client';
 
 export const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
-  username: {
+  fleetdm_user_email: {
     type: 'string',
     mask: false,
   },
-  password: {
+  fleetdm_user_password: {
     type: 'string',
     mask: true,
   },
-  hostname: {
+  fleetdm_hostname: {
     type: 'string',
     mask: false,
   },
 };
 
 export interface IntegrationConfig extends IntegrationInstanceConfig {
-  username: string;
-  password: string;
-  hostname: string;
+  fleetdm_user_email: string;
+  fleetdm_user_password: string;
+  fleetdm_hostname: string;
 }
 
 export async function validateInvocation(
@@ -40,20 +40,24 @@ export function parseConfig(
   initialConfig: IntegrationConfig,
 ): IntegrationConfig {
   const config = { ...initialConfig };
-  if (!config.username || !config.password || !config.hostname) {
+  if (
+    !config.fleetdm_user_email ||
+    !config.fleetdm_user_password ||
+    !config.fleetdm_hostname
+  ) {
     throw new IntegrationValidationError(
-      'Config requires all of username,password,hostname',
+      'Config requires all of fleetdm_user_email,fleetdm_user_password,fleetdm_hostname',
     );
   }
-  if (config.hostname.startsWith('http')) {
-    if (!config.hostname.startsWith('https')) {
+  if (config.fleetdm_hostname.startsWith('http')) {
+    if (!config.fleetdm_hostname.startsWith('https')) {
       throw new IntegrationValidationError(
         'Config hostname must be TLS-enabled with https://',
       );
     }
-    config.hostname = new URL(config.hostname).hostname;
+    config.fleetdm_hostname = new URL(config.fleetdm_hostname).hostname;
   }
   // don't allow trailing slash
-  config.hostname = config.hostname.replace(/\/$/, '');
+  config.fleetdm_hostname = config.fleetdm_hostname.replace(/\/$/, '');
   return config;
 }
