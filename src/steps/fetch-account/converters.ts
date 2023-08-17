@@ -4,9 +4,7 @@ import {
 } from '@jupiterone/integration-sdk-core';
 import { Entities } from '../constants';
 import { FleetDMInstanceConfig } from '../../types';
-
-const urlToKey = (keyPart: string): string =>
-  keyPart.split(/[^a-zA-Z0-9]+/).join('-');
+import { urlToKey } from '../../utils';
 
 export const createInstanceEntity = (
   fleetDMConfiguration: FleetDMInstanceConfig,

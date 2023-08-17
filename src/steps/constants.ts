@@ -9,7 +9,8 @@ export const Steps: Record<
   | 'FETCH_USERS'
   | 'FETCH_HOSTS'
   | 'FETCH_POLICIES'
-  | 'FETCH_SOFTWARE',
+  | 'FETCH_SOFTWARE'
+  | 'RELATE_HOSTS_TO_POLICIES',
   string
 > = {
   FETCH_ACCOUNT: 'fetch-account',
@@ -17,6 +18,7 @@ export const Steps: Record<
   FETCH_HOSTS: 'fetch-hosts',
   FETCH_POLICIES: 'fetch-policies',
   FETCH_SOFTWARE: 'fetch-software',
+  RELATE_HOSTS_TO_POLICIES: 'relate-hosts-to-policies',
 };
 
 export const Entities: Record<
@@ -55,6 +57,7 @@ export const Relationships: Record<
   | 'INSTANCE_HAS_POLICY'
   | 'INSTANCE_HAS_HOST'
   | 'POLICY_ASSIGNED_HOST'
+  | 'HOST_VIOLATES_POLICY'
   | 'HOST_INSTALLED_SOFTWARE',
   StepRelationshipMetadata
 > = {
@@ -79,8 +82,14 @@ export const Relationships: Record<
   POLICY_ASSIGNED_HOST: {
     sourceType: Entities.POLICY._type,
     targetType: Entities.HOST._type,
-    _type: 'fleetdm_policy_assigned_host',
+    _type: 'fleetdm_policy_assigned_hostagent',
     _class: RelationshipClass.ASSIGNED,
+  },
+  HOST_VIOLATES_POLICY: {
+    sourceType: Entities.HOST._type,
+    targetType: Entities.POLICY._type,
+    _type: 'fleetdm_hostagent_violates_policy',
+    _class: RelationshipClass.VIOLATES,
   },
   HOST_INSTALLED_SOFTWARE: {
     sourceType: Entities.HOST._type,

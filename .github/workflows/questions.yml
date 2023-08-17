@@ -14,7 +14,7 @@ jobs:
       - name: Check out target branch questions
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.ref }}}
+          ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           path: target
 
@@ -29,8 +29,10 @@ jobs:
 
       - name: Validate questions on target branch
         env:
-          MANAGED_QUESTIONS_JUPITERONE_ACCOUNT_ID: $
-          MANAGED_QUESTIONS_JUPITERONE_API_KEY: $
+          MANAGED_QUESTIONS_JUPITERONE_ACCOUNT_ID:
+            ${{ secrets.MANAGED_QUESTIONS_JUPITERONE_ACCOUNT_ID }}
+          MANAGED_QUESTIONS_JUPITERONE_API_KEY:
+            ${{ secrets.MANAGED_QUESTIONS_JUPITERONE_API_KEY }}
         run:
           yarn --cwd source j1-integration validate-question-file -a
           --frozen-lockfile $MANAGED_QUESTIONS_JUPITERONE_ACCOUNT_ID -k

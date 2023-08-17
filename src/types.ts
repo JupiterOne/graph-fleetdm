@@ -70,6 +70,17 @@ export interface FleetDMHost {
     encryption_key_available: boolean;
   };
   refetch_critical_queries_until: string;
+  labels: {
+    created_at: string;
+    updated_at: string;
+    id: number;
+    name: string;
+    description: string;
+    query: string;
+    platform: string;
+    label_type: string;
+    label_membership_type: string;
+  }[];
   status: string;
   display_text: string;
   display_name: string;
@@ -92,3 +103,22 @@ export type LoginResponse = {
   // for potential errors
   message: string;
 };
+
+export interface FleetDMPolicy {
+  id: number;
+  name: string;
+  query: string;
+  critical: boolean;
+  description: string;
+  author_id: number;
+  author_name: string;
+  author_email: string;
+  team_id: number | null;
+  resolution: string;
+  platform: string;
+  created_at: string;
+  updated_at: string;
+  passing_host_count: number;
+  failing_host_count: number;
+  response: string;
+}

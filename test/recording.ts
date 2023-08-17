@@ -61,7 +61,9 @@ function redact(entry): void {
   }
 
   if (entry.request.url.match(/hosts/)) {
-    const hosts: FleetDMHost[] = JSON.parse(entry.response.content.text).hosts;
+    const body = JSON.parse(entry.response.content.text);
+    const isIndividual = body.host !== undefined;
+    const hosts: FleetDMHost[] = isIndividual ? [body.host] : body.hosts;
     hosts.forEach((_, i) => {
       hosts[i].uuid = randomUUID();
       hosts[i].hardware_serial = `SERIAL${i}`;
@@ -73,6 +75,8 @@ function redact(entry): void {
       hosts[i].computer_name = `name${i}`;
       hosts[i].hostname = `host${i}`;
     });
-    entry.response.content.text = JSON.stringify({ hosts });
+    entry.response.content.text = JSON.stringify(
+      isIndividual ? { host: hosts[0] } : { hosts },
+    );
   }
 }

@@ -32,6 +32,7 @@ The following relationships are created:
 | Source Entity `_type` | Relationship `_class` | Target Entity `_type`      |
 | --------------------- | --------------------- | -------------------------- |
 | `fleetdm_hostagent`   | **INSTALLED**         | `fleetdm_host_application` |
+| `fleetdm_hostagent`   | **VIOLATES**          | `fleetdm_policy`           |
 | `fleetdm_instance`    | **HAS**               | `fleetdm_hostagent`        |
 | `fleetdm_instance`    | **HAS**               | `fleetdm_policy`           |
 | `fleetdm_instance`    | **HAS**               | `fleetdm_user`             |
