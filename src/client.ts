@@ -92,7 +92,14 @@ export class APIClient {
     } = await this._gaxios.request<{ host: FleetDMHost }>({
       url: `/hosts/${host_id}`,
     });
-    return host;
+    const {
+      data: { device_mapping },
+    } = await this._gaxios.request<{
+      device_mapping: FleetDMHost['device_mapping'];
+    }>({
+      url: `/hosts/${host_id}/device_mapping`,
+    });
+    return { ...host, device_mapping };
   }
 
   public async iterateHosts(

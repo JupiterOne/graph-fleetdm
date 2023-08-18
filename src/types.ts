@@ -70,7 +70,7 @@ export interface FleetDMHost {
     encryption_key_available: boolean;
   };
   refetch_critical_queries_until: string;
-  labels: {
+  labels?: {
     created_at: string;
     updated_at: string;
     id: number;
@@ -84,6 +84,30 @@ export interface FleetDMHost {
   status: string;
   display_text: string;
   display_name: string;
+  device_mapping?: {
+    email: string;
+    source: string;
+  }[];
+  software: FleetDMSoftware[];
+}
+
+export interface FleetDMSoftware {
+  id: number;
+  name: string;
+  version: string;
+  source: string;
+  release: string;
+  vendor: string;
+  arch: string;
+  generated_cpe: string;
+  vulnerabilities: {
+    cve: string;
+    details_link: string;
+    cvss_score: number;
+    epss_probability: number;
+    cisa_known_exploit: boolean;
+    cve_published: string;
+  }[];
 }
 
 export type LoginResponse = {

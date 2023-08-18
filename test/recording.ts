@@ -61,6 +61,17 @@ function redact(entry): void {
   }
 
   if (entry.request.url.match(/hosts/)) {
+    if (entry.request.url.match(/device_mapping/)) {
+      entry.response.content.text = JSON.stringify({
+        device_mapping: [
+          {
+            email: 'testuser@testdomain.net',
+            source: 'google_chrome_profiles',
+          },
+        ],
+      });
+      return;
+    }
     const body = JSON.parse(entry.response.content.text);
     const isIndividual = body.host !== undefined;
     const hosts: FleetDMHost[] = isIndividual ? [body.host] : body.hosts;
