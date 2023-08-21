@@ -1,5 +1,6 @@
 import {
   Entity,
+  IntegrationMissingKeyError,
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
@@ -12,14 +13,14 @@ import { createAPIClient } from '../../client';
 import { createPolicyEntity, getPolicyKey } from './converters';
 import { FleetDMInstanceConfig, FleetDMPolicy } from '../../types';
 
-export const fetechPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
+export const fetchPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_POLICIES,
     name: 'Fetch-Policies',
     entities: [Entities.POLICY],
     relationships: [Relationships.INSTANCE_HAS_POLICY],
     dependsOn: [Steps.FETCH_HOSTS],
-    executionHandler: fetechPolicies,
+    executionHandler: fetchPolicies,
   },
   {
     id: Steps.RELATE_HOSTS_TO_POLICIES,
@@ -34,7 +35,7 @@ export const fetechPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
   },
 ];
 
-export async function fetechPolicies({
+export async function fetchPolicies({
   jobState,
   logger,
   instance,
@@ -45,7 +46,9 @@ export async function fetechPolicies({
   );
   const fleetDMEntity = await jobState.getData<Entity>('fleetdmEntity');
   if (!fleetDMConfiguration || !fleetDMEntity) {
-    throw new Error('FleetDM instance configuration is not found');
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
   }
   /**
    * create policy entities
@@ -83,7 +86,9 @@ export async function relateHostsToPolicies({
     'fleetdmInstance',
   );
   if (!fleetDMConfiguration) {
-    throw new Error('FleetDM instance configuration is not found');
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
   }
   await jobState.iterateEntities(Entities.HOST, async (hostEntity) => {
     const hostPolicies = getPoliciesFromRawData(hostEntity._rawData);
@@ -92,7 +97,9 @@ export async function relateHostsToPolicies({
         getPolicyKey(fleetDMConfiguration, policy.id),
       );
       if (!policyEntity) {
-        throw new Error(`Policy entity not found for policy id: ${policy.id}`);
+        throw new IntegrationMissingKeyError(
+          `Policy entity not found for policy id: ${policy.id}`,
+        );
       }
       /**
        * optionally add the VIOLATES relationship if it did not pass

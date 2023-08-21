@@ -1,5 +1,6 @@
 import {
   Entity,
+  IntegrationMissingKeyError,
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
@@ -34,7 +35,9 @@ export async function fetchHosts({
   );
   const fleetDMEntity = await jobState.getData<Entity>('fleetdmEntity');
   if (!fleetDMConfiguration || !fleetDMEntity) {
-    throw new Error('FleetDM instance configuration is not found');
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
   }
   await client.iterateHosts(async (host) => {
     const hostEntity = await jobState.addEntity(

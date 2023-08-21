@@ -38,11 +38,8 @@ export const createPolicyEntity = (
         platform: policy.platform,
         createdOn: parseTimePropertyValue(policy.created_at),
         updatedOn: parseTimePropertyValue(policy.updated_at),
-        /**
-         * Should these be named as such?
-         */
-        failingCount: policy.failing_host_count,
-        passingCount: policy.passing_host_count,
+        failingHostCount: policy.failing_host_count,
+        passingHostCount: policy.passing_host_count,
       },
     },
   });
