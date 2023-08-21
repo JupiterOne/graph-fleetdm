@@ -77,7 +77,7 @@ function redact(entry): void {
     const hosts: FleetDMHost[] = isIndividual ? [body.host] : body.hosts;
     hosts.forEach((_, i) => {
       hosts[i].uuid = randomUUID();
-      hosts[i].hardware_serial = `SERIAL${i}`;
+      hosts[i].hardware_serial = `DEVICESERIAL${i}`;
       hosts[i].public_ip = `127.0.0.1`;
       hosts[i].primary_ip = `127.0.0.1`;
       hosts[i].primary_mac = `00:00:00:00:00:00`;
