@@ -25,6 +25,8 @@ export const createHostEntity = (
         name: host.display_name,
         function: ['endpoint-compliance', 'vulnerability-detection'],
         webLink: `${fleetDMConfiguration.server_settings.server_url}/hosts/${host.id}`,
+        labels: (host.labels || []).map((label) => label.name),
+        userEmails: (host.device_mapping || []).map((mapping) => mapping.email),
         macAddress: host.primary_mac,
         make: host.hardware_vendor,
         model: host.hardware_model,
@@ -50,9 +52,9 @@ export const createHostEntity = (
          */
         osVersion: getOSVersion(host.os_version),
         /**
-         * Converts b -> kb -> mb -> gb
+         * Converts b -> kb -> mb -> gb at 3 decimal places
          */
-        totalMemory: Math.round(host.memory / 1024 / 1024 / 1024),
+        totalMemory: parseFloat((host.memory / 1024 / 1024 / 1024).toFixed(3)),
         /**
          * Note that this number is not exact due to the lack of precision
          * on the `percent_disk_space_available` property.

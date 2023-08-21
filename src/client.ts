@@ -4,7 +4,15 @@ import {
 } from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig, parseConfig } from './config';
 import { Gaxios } from 'gaxios';
-import { FleetDMHost, FleetDMInstanceConfig, LoginResponse } from './types';
+import {
+  FleetDMHost,
+  FleetDMInstanceConfig,
+  FleetDMPolicy,
+  LoginResponse,
+} from './types';
+import pMap from 'p-map';
+
+const MAX_PAGES = 10000;
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
@@ -78,12 +86,26 @@ export class APIClient {
     return data;
   }
 
+  private async fetchHost(host_id: number): Promise<FleetDMHost> {
+    const {
+      data: { host },
+    } = await this._gaxios.request<{ host: FleetDMHost }>({
+      url: `/hosts/${host_id}`,
+    });
+    const {
+      data: { device_mapping },
+    } = await this._gaxios.request<{
+      device_mapping: FleetDMHost['device_mapping'];
+    }>({
+      url: `/hosts/${host_id}/device_mapping`,
+    });
+    return { ...host, device_mapping };
+  }
+
   public async iterateHosts(
     iteratee: ResourceIteratee<FleetDMHost>,
   ): Promise<void> {
     const per_page = 250;
-    const MAX_PAGES = 10000;
-
     for (let page = 0; page <= MAX_PAGES; page++) {
       const { data } = await this._gaxios.request<{ hosts: FleetDMHost[] }>({
         url: '/hosts',
@@ -91,7 +113,16 @@ export class APIClient {
       });
 
       if (data.hosts.length === 0) break;
-      await Promise.all(data.hosts.map(iteratee));
+      /**
+       * Fetch each host's details in parallel (up to 10).
+       * We need all of the host data to be able to create relationships
+       * properly and add labels to the entities.
+       */
+      await pMap(
+        data.hosts,
+        async (host) => iteratee(await this.fetchHost(host.id)),
+        { concurrency: 10 },
+      );
       if (page === MAX_PAGES) {
         this.logger?.warn(
           { page, per_page },
@@ -99,6 +130,18 @@ export class APIClient {
         );
       }
     }
+  }
+
+  public async iteratePolicies(
+    iteratee: ResourceIteratee<FleetDMPolicy>,
+  ): Promise<void> {
+    const { data } = await this._gaxios.request<{
+      policies: FleetDMPolicy[];
+    }>({
+      url: '/global/policies',
+    });
+
+    await Promise.all(data.policies.map(iteratee));
   }
 }
 
