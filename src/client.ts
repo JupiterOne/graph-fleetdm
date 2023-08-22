@@ -1,12 +1,16 @@
 import {
   IntegrationLogger,
+  IntegrationProviderAPIError,
   IntegrationProviderAuthenticationError,
+  IntegrationValidationError,
 } from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig, parseConfig } from './config';
 import { Gaxios } from 'gaxios';
 import {
+  FleetDMDeviceMapping,
   FleetDMHost,
   FleetDMInstanceConfig,
+  FleetDMLabels,
   FleetDMPolicy,
   LoginResponse,
 } from './types';
@@ -28,8 +32,13 @@ export class APIClient {
   private _gaxios: Gaxios;
   private _verified: boolean = false;
   private logger?: IntegrationLogger;
-  constructor(readonly config: IntegrationConfig, logger?: IntegrationLogger) {
+  private _config?: IntegrationConfig;
+  constructor(
+    readonly config: IntegrationConfig,
+    logger?: IntegrationLogger,
+  ) {
     this.logger = logger;
+    this._config = parseConfig(config); // assert that the config is parsed
     this._gaxios = new Gaxios({
       timeout: 15_000, // 15 secs max
       baseURL: `https://${config.fleetdm_hostname}/api/v1/fleet`,
@@ -75,6 +84,38 @@ export class APIClient {
     return Promise.resolve();
   }
 
+  public async validateUserEndpointLabels(): Promise<void> {
+    const { data } = await this._gaxios.request<FleetDMLabels>({
+      url: '/labels',
+    });
+    const userEndpointLabels = this._config
+      ?.fleetdm_user_endpoint_labels as string[];
+    if (data.labels) {
+      const foundLabels = userEndpointLabels.filter(
+        (userEndpointLabel) =>
+          data.labels?.find((label) => label.name === userEndpointLabel),
+      );
+      if (foundLabels.length !== userEndpointLabels.length) {
+        throw new IntegrationValidationError(
+          `The specified user endpoint label(s) are invalid: ${userEndpointLabels
+            .filter((label) => !foundLabels.includes(label))
+            .join(',')}.
+
+            Valid labels are: ${data.labels
+              .map((label) => label.name)
+              .join(',')}`,
+        );
+      }
+    } else {
+      throw new IntegrationProviderAPIError({
+        endpoint: '/labels',
+        cause: new Error('No labels found'),
+        status: 404,
+        statusText: 'Not Found',
+      });
+    }
+  }
+
   public async getAccount(): Promise<FleetDMInstanceConfig> {
     const { data } = await this._gaxios.request<FleetDMInstanceConfig>({
       url: '/config',
@@ -94,9 +135,7 @@ export class APIClient {
     });
     const {
       data: { device_mapping },
-    } = await this._gaxios.request<{
-      device_mapping: FleetDMHost['device_mapping'];
-    }>({
+    } = await this._gaxios.request<FleetDMDeviceMapping>({
       url: `/hosts/${host_id}/device_mapping`,
     });
     return { ...host, device_mapping };
@@ -151,7 +190,7 @@ export function createAPIClient(
   _config: IntegrationConfig,
   logger?: IntegrationLogger,
 ): APIClient {
-  const config = parseConfig(_config);
+  const config = parseConfig(_config, logger);
   const _key = `${config.fleetdm_hostname}:${config.fleetdm_user_email}`;
 
   if (!API_CLIENTS.has(_key)) {

@@ -29,6 +29,8 @@ export const fetchPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
     relationships: [
       Relationships.POLICY_ASSIGNED_HOST,
       Relationships.HOST_VIOLATES_POLICY,
+      Relationships.POLICY_ASSIGNED_DEVICE,
+      Relationships.DEVICE_VIOLATES_POLICY,
     ],
     dependsOn: [Steps.FETCH_HOSTS, Steps.FETCH_POLICIES],
     executionHandler: relateHostsToPolicies,
@@ -41,9 +43,8 @@ export async function fetchPolicies({
   instance,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const client = createAPIClient(instance.config, logger);
-  const fleetDMConfiguration = await jobState.getData<FleetDMInstanceConfig>(
-    'fleetdmInstance',
-  );
+  const fleetDMConfiguration =
+    await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
   const fleetDMEntity = await jobState.getData<Entity>('fleetdmEntity');
   if (!fleetDMConfiguration || !fleetDMEntity) {
     throw new IntegrationMissingKeyError(
@@ -82,15 +83,14 @@ const getPoliciesFromRawData = (rawData: any): FleetDMPolicy[] => {
 export async function relateHostsToPolicies({
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const fleetDMConfiguration = await jobState.getData<FleetDMInstanceConfig>(
-    'fleetdmInstance',
-  );
+  const fleetDMConfiguration =
+    await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
   if (!fleetDMConfiguration) {
     throw new IntegrationMissingKeyError(
       'FleetDM instance configuration is not found',
     );
   }
-  await jobState.iterateEntities(Entities.HOST, async (hostEntity) => {
+  const iterator = async (hostEntity: Entity) => {
     const hostPolicies = getPoliciesFromRawData(hostEntity._rawData);
     for (const policy of hostPolicies) {
       const policyEntity = await jobState.findEntity(
@@ -124,5 +124,7 @@ export async function relateHostsToPolicies({
         }),
       );
     }
-  });
+  };
+  await jobState.iterateEntities(Entities.HOST, iterator);
+  await jobState.iterateEntities(Entities.DEVICE, iterator);
 }

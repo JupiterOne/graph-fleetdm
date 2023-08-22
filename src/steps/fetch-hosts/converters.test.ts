@@ -1,4 +1,5 @@
 import { getOSVersion } from './converters';
+
 describe('getOSVersion', () => {
   const versions = [
     ['0', '0'],

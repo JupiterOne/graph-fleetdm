@@ -11,7 +11,10 @@ export const fetchSoftwareSteps: IntegrationStep<IntegrationConfig>[] = [
     id: Steps.FETCH_SOFTWARE,
     name: 'Fetch-Software',
     entities: [Entities.SOFTWARE],
-    relationships: [Relationships.HOST_INSTALLED_SOFTWARE],
+    relationships: [
+      Relationships.HOST_INSTALLED_SOFTWARE,
+      Relationships.DEVICE_INSTALLED_SOFTWARE,
+    ],
     dependsOn: [Steps.FETCH_HOSTS],
     executionHandler: fetchSoftware,
   },

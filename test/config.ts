@@ -15,6 +15,8 @@ export const integrationConfig: IntegrationConfig = {
   fleetdm_user_email: process.env.FLEETDM_USER_EMAIL || 'test@user.net',
   fleetdm_user_password: process.env.FLEETDM_USER_PASSWORD || 'test.password',
   fleetdm_hostname: process.env.FLEETDM_HOSTNAME || 'fleetdm.dev.jupiterone.io', // this has to match for recordings
+  fleetdm_user_endpoint_labels:
+    process.env.FLEETDM_USER_ENDPOINT_LABELS || '["user-devices"]',
 };
 
 export function buildStepTestConfigForStep(

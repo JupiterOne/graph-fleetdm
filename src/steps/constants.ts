@@ -22,7 +22,7 @@ export const Steps: Record<
 };
 
 export const Entities: Record<
-  'INSTANCE' | 'USER' | 'HOST' | 'POLICY' | 'SOFTWARE',
+  'INSTANCE' | 'USER' | 'DEVICE' | 'HOST' | 'POLICY' | 'SOFTWARE',
   StepEntityMetadata
 > = {
   INSTANCE: {
@@ -35,10 +35,15 @@ export const Entities: Record<
     _type: 'fleetdm_user',
     _class: ['User'],
   },
+  DEVICE: {
+    resourceName: 'Host',
+    _type: 'user_endpoint',
+    _class: ['Device'],
+  },
   HOST: {
     resourceName: 'Host',
-    _type: 'fleetdm_hostagent',
-    _class: ['HostAgent'],
+    _type: 'fleetdm_host',
+    _class: ['Host'],
   },
   POLICY: {
     resourceName: 'Policy',
@@ -47,7 +52,7 @@ export const Entities: Record<
   },
   SOFTWARE: {
     resourceName: 'Software',
-    _type: 'fleetdm_host_application',
+    _type: 'fleetdm_application',
     _class: ['Application'],
   },
 };
@@ -56,9 +61,13 @@ export const Relationships: Record<
   | 'INSTANCE_HAS_USER'
   | 'INSTANCE_HAS_POLICY'
   | 'INSTANCE_HAS_HOST'
+  | 'INSTANCE_HAS_DEVICE'
+  | 'POLICY_ASSIGNED_DEVICE'
   | 'POLICY_ASSIGNED_HOST'
   | 'HOST_VIOLATES_POLICY'
-  | 'HOST_INSTALLED_SOFTWARE',
+  | 'DEVICE_VIOLATES_POLICY'
+  | 'HOST_INSTALLED_SOFTWARE'
+  | 'DEVICE_INSTALLED_SOFTWARE',
   StepRelationshipMetadata
 > = {
   INSTANCE_HAS_USER: {
@@ -73,28 +82,52 @@ export const Relationships: Record<
     _type: 'fleetdm_instance_has_policy',
     _class: RelationshipClass.HAS,
   },
+  INSTANCE_HAS_DEVICE: {
+    sourceType: Entities.INSTANCE._type,
+    targetType: Entities.DEVICE._type,
+    _type: 'fleetdm_instance_has_user_endpoint',
+    _class: RelationshipClass.HAS,
+  },
   INSTANCE_HAS_HOST: {
     sourceType: Entities.INSTANCE._type,
     targetType: Entities.HOST._type,
-    _type: 'fleetdm_instance_has_hostagent',
+    _type: 'fleetdm_instance_has_host',
     _class: RelationshipClass.HAS,
   },
   POLICY_ASSIGNED_HOST: {
     sourceType: Entities.POLICY._type,
     targetType: Entities.HOST._type,
-    _type: 'fleetdm_policy_assigned_hostagent',
+    _type: 'fleetdm_policy_assigned_host',
+    _class: RelationshipClass.ASSIGNED,
+  },
+  POLICY_ASSIGNED_DEVICE: {
+    sourceType: Entities.POLICY._type,
+    targetType: Entities.DEVICE._type,
+    _type: 'fleetdm_policy_assigned_user_endpoint',
     _class: RelationshipClass.ASSIGNED,
   },
   HOST_VIOLATES_POLICY: {
     sourceType: Entities.HOST._type,
     targetType: Entities.POLICY._type,
-    _type: 'fleetdm_hostagent_violates_policy',
+    _type: 'fleetdm_host_violates_policy',
+    _class: RelationshipClass.VIOLATES,
+  },
+  DEVICE_VIOLATES_POLICY: {
+    sourceType: Entities.DEVICE._type,
+    targetType: Entities.POLICY._type,
+    _type: 'user_endpoint_violates_fleetdm_policy',
     _class: RelationshipClass.VIOLATES,
   },
   HOST_INSTALLED_SOFTWARE: {
     sourceType: Entities.HOST._type,
     targetType: Entities.SOFTWARE._type,
-    _type: 'fleetdm_hostagent_installed_application',
+    _type: 'fleetdm_host_installed_application',
+    _class: RelationshipClass.INSTALLED,
+  },
+  DEVICE_INSTALLED_SOFTWARE: {
+    sourceType: Entities.DEVICE._type,
+    targetType: Entities.SOFTWARE._type,
+    _type: 'user_endpoint_installed_application',
     _class: RelationshipClass.INSTALLED,
   },
 };

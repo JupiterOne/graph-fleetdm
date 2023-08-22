@@ -20,7 +20,7 @@ export interface FleetDMInstanceConfig {
   smtp_settings: any;
 }
 
-export interface FleetDMHost {
+export interface FleetDMHost extends FleetDMLabels, FleetDMDeviceMapping {
   created_at: string;
   updated_at: string;
   software_updated_at: string;
@@ -70,6 +70,21 @@ export interface FleetDMHost {
     encryption_key_available: boolean;
   };
   refetch_critical_queries_until: string;
+  status: string;
+  display_text: string;
+  display_name: string;
+
+  software: FleetDMSoftware[];
+}
+
+export interface FleetDMDeviceMapping {
+  device_mapping: {
+    email: string;
+    source: string;
+  }[];
+}
+
+export interface FleetDMLabels {
   labels?: {
     created_at: string;
     updated_at: string;
@@ -81,14 +96,6 @@ export interface FleetDMHost {
     label_type: string;
     label_membership_type: string;
   }[];
-  status: string;
-  display_text: string;
-  display_name: string;
-  device_mapping?: {
-    email: string;
-    source: string;
-  }[];
-  software: FleetDMSoftware[];
 }
 
 export interface FleetDMSoftware {
