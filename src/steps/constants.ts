@@ -1,6 +1,8 @@
 import {
   RelationshipClass,
+  RelationshipDirection,
   StepEntityMetadata,
+  StepMappedRelationshipMetadata,
   StepRelationshipMetadata,
 } from '@jupiterone/integration-sdk-core';
 import { generateRelationshipMetadata } from '../helpers';
@@ -10,7 +12,7 @@ export const Steps = {
   FETCH_USERS: 'fetch-users',
   FETCH_HOSTS: 'fetch-hosts',
   FETCH_POLICIES: 'fetch-policies',
-  FETCH_SOFTWARE: 'fetch-software',
+  RELATE_HOSTS_TO_SOFTWARE: 'relate-hosts-to-software',
   RELATE_HOSTS_TO_POLICIES: 'relate-hosts-to-policies',
   RELATE_INSTANCE_TO_USERS: 'relate-instance-to-users',
 } satisfies Record<string, `fetch-${string}` | `relate-${string}-to-${string}`>;
@@ -43,7 +45,7 @@ export const Entities = {
   },
   SOFTWARE: {
     resourceName: 'Software',
-    _type: 'fleetdm_application',
+    _type: 'fleetdm_software',
     _class: ['Application'],
   },
 } satisfies Record<string, StepEntityMetadata>;
@@ -100,3 +102,20 @@ export const Relationships = {
     to: Entities.HOST,
   }),
 } satisfies Record<string, StepRelationshipMetadata>;
+
+export const MappedRelationships = {
+  HOST_INSTALLED_SOFTWARE: {
+    sourceType: Entities.HOST._type,
+    targetType: Entities.SOFTWARE._type,
+    _type: 'fleetdm_host_installed_application',
+    _class: RelationshipClass.INSTALLED,
+    direction: RelationshipDirection.FORWARD,
+  },
+  DEVICE_INSTALLED_SOFTWARE: {
+    sourceType: Entities.DEVICE._type,
+    targetType: Entities.SOFTWARE._type,
+    _type: 'user_endpoint_installed_application',
+    _class: RelationshipClass.INSTALLED,
+    direction: RelationshipDirection.FORWARD,
+  },
+} satisfies Record<string, StepMappedRelationshipMetadata>;

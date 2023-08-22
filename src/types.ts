@@ -115,6 +115,7 @@ export interface FleetDMSoftware {
     cisa_known_exploit: boolean;
     cve_published: string;
   }[];
+  installed_paths: string[];
 }
 
 export type LoginResponse = {
