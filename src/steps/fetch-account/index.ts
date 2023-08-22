@@ -26,9 +26,6 @@ export async function fetchAccount({
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const client = createAPIClient(instance.config, logger);
   const fleetdmInstance = await client.getAccount();
-  const fleetdmEntity = await jobState.addEntity(
-    createInstanceEntity(fleetdmInstance),
-  );
+  await jobState.addEntity(createInstanceEntity(fleetdmInstance));
   await jobState.setData('fleetdmInstance', fleetdmInstance);
-  await jobState.setData('fleetdmEntity', fleetdmEntity);
 }

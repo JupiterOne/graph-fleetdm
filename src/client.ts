@@ -12,6 +12,7 @@ import {
   FleetDMInstanceConfig,
   FleetDMLabels,
   FleetDMPolicy,
+  FleetDMUser,
   LoginResponse,
 } from './types';
 import pMap from 'p-map';
@@ -139,6 +140,29 @@ export class APIClient {
       url: `/hosts/${host_id}/device_mapping`,
     });
     return { ...host, device_mapping };
+  }
+
+  public async iterateUsers(
+    iteratee: ResourceIteratee<FleetDMUser>,
+  ): Promise<void> {
+    const per_page = 250;
+    const MAX_PAGES = 10000;
+
+    for (let page = 0; page <= MAX_PAGES; page++) {
+      const { data } = await this._gaxios.request<{ users: FleetDMUser[] }>({
+        url: '/users',
+        params: { page, per_page },
+      });
+
+      if (data.users.length === 0) break;
+      await Promise.all(data.users.map(iteratee));
+      if (page === MAX_PAGES) {
+        this.logger?.warn(
+          { page, per_page },
+          'Max pages reached, stopping iteration',
+        );
+      }
+    }
   }
 
   public async iterateHosts(

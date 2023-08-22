@@ -5,6 +5,7 @@ import {
 import { Entities } from '../constants';
 import { FleetDMInstanceConfig } from '../../types';
 import { urlToKey } from '../../utils';
+import { createEntityKey } from '../../helpers';
 
 export const createInstanceEntity = (
   fleetDMConfiguration: FleetDMInstanceConfig,
@@ -14,9 +15,7 @@ export const createInstanceEntity = (
       source: fleetDMConfiguration,
       assign: {
         // The server URL is the most unique aspect of a FleetDM instance.
-        _key: `${Entities.INSTANCE._type}:${urlToKey(
-          fleetDMConfiguration.server_settings.server_url,
-        )}`,
+        _key: createInstanceEntityKey(fleetDMConfiguration),
         _type: Entities.INSTANCE._type,
         _class: Entities.INSTANCE._class,
         displayName: fleetDMConfiguration.org_info.org_name,
@@ -28,3 +27,11 @@ export const createInstanceEntity = (
     },
   });
 };
+
+export const createInstanceEntityKey = (
+  fleetDMConfiguration: FleetDMInstanceConfig,
+) =>
+  createEntityKey(
+    Entities.INSTANCE,
+    urlToKey(fleetDMConfiguration.server_settings.server_url),
+  );
