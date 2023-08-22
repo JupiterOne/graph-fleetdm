@@ -43,7 +43,7 @@ export const Entities: Record<
   HOST: {
     resourceName: 'Host',
     _type: 'fleetdm_host',
-    _class: ['Host', 'Device'],
+    _class: ['Host'],
   },
   POLICY: {
     resourceName: 'Policy',

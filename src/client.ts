@@ -190,7 +190,7 @@ export function createAPIClient(
   _config: IntegrationConfig,
   logger?: IntegrationLogger,
 ): APIClient {
-  const config = parseConfig(_config);
+  const config = parseConfig(_config, logger);
   const _key = `${config.fleetdm_hostname}:${config.fleetdm_user_email}`;
 
   if (!API_CLIENTS.has(_key)) {

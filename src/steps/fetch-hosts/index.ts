@@ -41,29 +41,34 @@ export async function fetchHosts({
       'FleetDM instance configuration is not found',
     );
   }
-  const userEndpointLabels = parseConfig(instance.config)
+  const userEndpointLabels = parseConfig(instance.config, logger)
     .fleetdm_user_endpoint_labels as string[];
-  const selectiveUserEndpoints = userEndpointLabels.length > 0;
   await client.iterateHosts(async (host) => {
-    if (selectiveUserEndpoints) {
-      if (
-        !host.labels?.find((label) => userEndpointLabels.includes(label.name))
-      ) {
-        /**
-         * create a host entity and go next
-         */
-        const hostEntity = await jobState.addEntity(
-          createHostEntity(host, fleetDMConfiguration),
-        );
-        await jobState.addRelationship(
-          createDirectRelationship({
-            from: fleetDMEntity,
-            to: hostEntity,
-            _class: RelationshipClass.HAS,
-          }),
-        );
-        return;
-      }
+    /**
+     * when the config has user endpoint labels listed, only those
+     * hosts with the labels will be created as Device entities.
+     *
+     * the flow is structured this way so that only Device entities are
+     * created if the list of labels is empty.
+     */
+    if (
+      userEndpointLabels.length > 0 &&
+      !host.labels?.find((label) => userEndpointLabels.includes(label.name))
+    ) {
+      /**
+       * create a host entity and go next
+       */
+      const hostEntity = await jobState.addEntity(
+        createHostEntity(host, fleetDMConfiguration),
+      );
+      await jobState.addRelationship(
+        createDirectRelationship({
+          from: fleetDMEntity,
+          to: hostEntity,
+          _class: RelationshipClass.HAS,
+        }),
+      );
+      return;
     }
     /**
      * create a device entity

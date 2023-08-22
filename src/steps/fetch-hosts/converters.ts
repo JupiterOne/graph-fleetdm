@@ -110,7 +110,7 @@ const getCommonProperties = (
   appleSilicon:
     host.hardware_vendor.includes('Apple') && host.cpu_type.includes('arm'),
   /**
-   * These 2 property intentionally assumes that the host platform is one of the big 3.
+   * These 2 properties intentionally assumes that the host platform is one of the big 3.
    * If it's not, we're defaulting to Linux since enumerating each OS flavor would
    * not be a simple task (ChromeOS, debian, Fedora, FreeBSD, etc.).
    *

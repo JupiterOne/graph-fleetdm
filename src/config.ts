@@ -3,6 +3,7 @@ import {
   IntegrationValidationError,
   IntegrationInstanceConfigFieldMap,
   IntegrationInstanceConfig,
+  IntegrationLogger,
 } from '@jupiterone/integration-sdk-core';
 import { createAPIClient } from './client';
 
@@ -44,8 +45,10 @@ export async function validateInvocation(
 
 export function parseConfig(
   initialConfig: IntegrationConfig,
+  logger?: IntegrationLogger,
 ): IntegrationConfig {
   const config = { ...initialConfig };
+  logger?.info('Parsing config');
   if (
     !config.fleetdm_user_email ||
     !config.fleetdm_user_password ||
@@ -67,16 +70,21 @@ export function parseConfig(
   const origLabels = config.fleetdm_user_endpoint_labels;
 
   if (!origLabels) {
+    logger?.info('No labels specified, all hosts will be user endpoints');
     config.fleetdm_user_endpoint_labels = [];
   } else if (typeof origLabels === 'string') {
     if (origLabels.startsWith('[') && origLabels.endsWith(']')) {
+      logger?.info('Parsing user endpoint labels as JSON array of strings');
       config.fleetdm_user_endpoint_labels = JSON.parse(origLabels);
     } else {
-      config.fleetdm_user_endpoint_labels = origLabels.split(',');
+      logger?.info('Parsing user endpoint labels as comma-separated values');
+      config.fleetdm_user_endpoint_labels = origLabels
+        .split(',')
+        .map((s) => s.trim());
     }
   } else if (!Array.isArray(origLabels)) {
     throw new IntegrationValidationError(
-      'Config fleetdm_user_endpoint_labels must be an array of strings',
+      'Config fleetdm_user_endpoint_labels must be a string or an array of strings',
     );
   }
 

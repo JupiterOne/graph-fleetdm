@@ -58,5 +58,15 @@ describe('parseConfig', () => {
       fleetdm_user_endpoint_labels: ['general', 'kenobi'],
     });
     expect(parseConfig(parsed2)).toEqual(parsed2);
+
+    const parsed3 = parseConfig({
+      ...defaultsWithHosname,
+      fleetdm_user_endpoint_labels: 'general, kenobi',
+    });
+    expect(parsed3).toEqual({
+      ...defaultsWithHosname,
+      fleetdm_user_endpoint_labels: ['general', 'kenobi'],
+    });
+    expect(parseConfig(parsed3)).toEqual(parsed3);
   });
 });
