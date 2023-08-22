@@ -6,6 +6,7 @@ import {
   createDirectRelationship,
   generateRelationshipType,
 } from '@jupiterone/integration-sdk-core';
+import { Steps } from './steps/constants';
 
 export const createEntityKey = (
   entityMetadata: StepEntityMetadata,
@@ -44,4 +45,12 @@ export const generateRelationshipMetadata = ({
     sourceType: from._type,
     _class,
     targetType: to._type,
-  } satisfies StepRelationshipMetadata);
+  }) satisfies StepRelationshipMetadata;
+
+const capitalizeFirstChar = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const getStepName = (step: (typeof Steps)[keyof typeof Steps]) => {
+  return capitalizeFirstChar(step.split('-').join(' '));
+};

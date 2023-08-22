@@ -7,14 +7,14 @@ import { IntegrationConfig } from '../../config';
 import { Steps, Entities, Relationships } from '../constants';
 import { createAPIClient } from '../../client';
 import { createUserEntity } from './converters';
-import { createRelationship } from '../../helpers';
+import { createRelationship, getStepName } from '../../helpers';
 import { createInstanceEntityKey } from '../fetch-account/converters';
 import { FleetDMInstanceConfig } from '../../types';
 
 export const fetchUsersSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_USERS,
-    name: Steps.FETCH_USERS,
+    name: getStepName(Steps.FETCH_USERS),
     entities: [Entities.USER],
     relationships: [],
     dependsOn: [Steps.FETCH_ACCOUNT],
@@ -22,7 +22,7 @@ export const fetchUsersSteps: IntegrationStep<IntegrationConfig>[] = [
   },
   {
     id: Steps.RELATE_INSTANCE_TO_USERS,
-    name: Steps.RELATE_INSTANCE_TO_USERS,
+    name: getStepName(Steps.RELATE_INSTANCE_TO_USERS),
     entities: [],
     relationships: [Relationships.INSTANCE_HAS_USER],
     dependsOn: [Steps.FETCH_ACCOUNT, Steps.FETCH_USERS],
@@ -44,9 +44,8 @@ export async function fetchUsers({
 export async function relateInstanceToUsers({
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const fleetDMInstance = await jobState.getData<FleetDMInstanceConfig>(
-    'fleetdmInstance',
-  );
+  const fleetDMInstance =
+    await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
 
   if (!fleetDMInstance) {
     throw new Error('FleetDM instance configuration is not found');

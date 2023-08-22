@@ -5,11 +5,12 @@ import {
 
 import { IntegrationConfig } from '../../config';
 import { Steps, Entities, Relationships } from '../constants';
+import { getStepName } from '../../helpers';
 
 export const fetchSoftwareSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_SOFTWARE,
-    name: 'Fetch-Software',
+    name: getStepName(Steps.FETCH_SOFTWARE),
     entities: [Entities.SOFTWARE],
     relationships: [
       Relationships.HOST_INSTALLED_SOFTWARE,

@@ -9,13 +9,13 @@ import { Steps, Entities, Relationships } from '../constants';
 import { createAPIClient } from '../../client';
 import { createDeviceEntity, createHostEntity } from './converters';
 import { FleetDMInstanceConfig } from '../../types';
-import { createRelationship } from '../../helpers';
+import { createRelationship, getStepName } from '../../helpers';
 import { createInstanceEntityKey } from '../fetch-account/converters';
 
 export const fetchHostsSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_HOSTS,
-    name: 'Fetch-Hosts',
+    name: getStepName(Steps.FETCH_HOSTS),
     entities: [Entities.HOST, Entities.DEVICE],
     relationships: [
       Relationships.INSTANCE_HAS_HOST,
@@ -32,9 +32,8 @@ export async function fetchHosts({
   logger,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const client = createAPIClient(instance.config, logger);
-  const fleetDMConfiguration = await jobState.getData<FleetDMInstanceConfig>(
-    'fleetdmInstance',
-  );
+  const fleetDMConfiguration =
+    await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
   if (!fleetDMConfiguration) {
     throw new IntegrationMissingKeyError(
       'FleetDM instance configuration is not found',
@@ -80,6 +79,7 @@ export async function fetchHosts({
       );
       return;
     }
+
     /**
      *
      * create a device entity

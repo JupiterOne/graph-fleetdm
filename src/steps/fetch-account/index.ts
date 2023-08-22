@@ -7,11 +7,12 @@ import { IntegrationConfig } from '../../config';
 import { Steps, Entities } from '../constants';
 import { createAPIClient } from '../../client';
 import { createInstanceEntity } from './converters';
+import { getStepName } from '../../helpers';
 
 export const fetchAccountSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_ACCOUNT,
-    name: 'Fetch-Account',
+    name: getStepName(Steps.FETCH_ACCOUNT),
     entities: [Entities.INSTANCE],
     relationships: [],
     dependsOn: [],
