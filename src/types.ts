@@ -153,3 +153,25 @@ export interface FleetDMPolicy {
   failing_host_count: number;
   response: string;
 }
+
+export type FleetDMUserTeam = {
+  id: number;
+  created_at: string;
+  name: string;
+  description: string;
+  role: string;
+};
+
+export type FleetDMUser = {
+  created_at: string;
+  updated_at: string;
+  id: number;
+  name: string;
+  email: string;
+  force_password_reset: boolean;
+  gravatar_url: string;
+  sso_enabled: boolean;
+  global_role: string;
+  api_only: boolean;
+  teams: FleetDMUserTeam[];
+};

@@ -1,10 +1,7 @@
 import {
-  Entity,
   IntegrationMissingKeyError,
   IntegrationStep,
   IntegrationStepExecutionContext,
-  RelationshipClass,
-  createDirectRelationship,
 } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig, parseConfig } from '../../config';
@@ -12,11 +9,13 @@ import { Steps, Entities, Relationships } from '../constants';
 import { createAPIClient } from '../../client';
 import { createDeviceEntity, createHostEntity } from './converters';
 import { FleetDMInstanceConfig } from '../../types';
+import { createRelationship, getStepName } from '../../helpers';
+import { createInstanceEntityKey } from '../fetch-account/converters';
 
 export const fetchHostsSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_HOSTS,
-    name: 'Fetch-Hosts',
+    name: getStepName(Steps.FETCH_HOSTS),
     entities: [Entities.HOST, Entities.DEVICE],
     relationships: [
       Relationships.INSTANCE_HAS_HOST,
@@ -35,14 +34,24 @@ export async function fetchHosts({
   const client = createAPIClient(instance.config, logger);
   const fleetDMConfiguration =
     await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
-  const fleetDMEntity = await jobState.getData<Entity>('fleetdmEntity');
-  if (!fleetDMConfiguration || !fleetDMEntity) {
+  if (!fleetDMConfiguration) {
     throw new IntegrationMissingKeyError(
       'FleetDM instance configuration is not found',
     );
   }
+
+  const fleetDMInstanceEntity = await jobState.findEntity(
+    createInstanceEntityKey(fleetDMConfiguration),
+  );
+  if (!fleetDMInstanceEntity) {
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
+  }
+
   const userEndpointLabels = parseConfig(instance.config, logger)
     .fleetdm_user_endpoint_labels as string[];
+
   await client.iterateHosts(async (host) => {
     /**
      * when the config has user endpoint labels listed, only those
@@ -62,25 +71,27 @@ export async function fetchHosts({
         createHostEntity(host, fleetDMConfiguration),
       );
       await jobState.addRelationship(
-        createDirectRelationship({
-          from: fleetDMEntity,
+        createRelationship({
+          from: fleetDMInstanceEntity,
           to: hostEntity,
-          _class: RelationshipClass.HAS,
+          relationship: Relationships.INSTANCE_HAS_HOST,
         }),
       );
       return;
     }
+
     /**
+     *
      * create a device entity
      */
     const deviceEntity = await jobState.addEntity(
       createDeviceEntity(host, fleetDMConfiguration),
     );
     await jobState.addRelationship(
-      createDirectRelationship({
-        from: fleetDMEntity,
+      createRelationship({
+        from: fleetDMInstanceEntity,
         to: deviceEntity,
-        _class: RelationshipClass.HAS,
+        relationship: Relationships.INSTANCE_HAS_DEVICE,
       }),
     );
   });

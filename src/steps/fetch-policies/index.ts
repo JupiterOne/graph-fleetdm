@@ -12,11 +12,12 @@ import { Steps, Entities, Relationships } from '../constants';
 import { createAPIClient } from '../../client';
 import { createPolicyEntity, getPolicyKey } from './converters';
 import { FleetDMInstanceConfig, FleetDMPolicy } from '../../types';
+import { getStepName } from '../../helpers';
 
 export const fetchPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.FETCH_POLICIES,
-    name: 'Fetch-Policies',
+    name: getStepName(Steps.FETCH_POLICIES),
     entities: [Entities.POLICY],
     relationships: [Relationships.INSTANCE_HAS_POLICY],
     dependsOn: [Steps.FETCH_HOSTS],
@@ -24,7 +25,7 @@ export const fetchPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
   },
   {
     id: Steps.RELATE_HOSTS_TO_POLICIES,
-    name: 'Relate-Hosts-To-Policies',
+    name: getStepName(Steps.RELATE_HOSTS_TO_POLICIES),
     entities: [],
     relationships: [
       Relationships.POLICY_ASSIGNED_HOST,
