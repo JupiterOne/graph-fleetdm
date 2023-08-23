@@ -6,7 +6,7 @@ import {
 
 import { FleetDMInstanceConfig, FleetDMPolicy } from '../../types';
 import { Entities } from '../constants';
-import { urlToKey } from '../../utils';
+import { urlToKey } from '../../helpers';
 
 export const getPolicyKey = (
   fleetDMConfiguration: FleetDMInstanceConfig,
