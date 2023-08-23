@@ -1,4 +1,5 @@
 import {
+  IntegrationMissingKeyError,
   IntegrationStep,
   IntegrationStepExecutionContext,
 } from '@jupiterone/integration-sdk-core';
@@ -48,7 +49,9 @@ export async function relateInstanceToUsers({
     await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
 
   if (!fleetDMInstance) {
-    throw new Error('FleetDM instance configuration is not found');
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
   }
 
   const fleetDMInstanceEntity = await jobState.findEntity(
@@ -56,7 +59,9 @@ export async function relateInstanceToUsers({
   );
 
   if (!fleetDMInstanceEntity) {
-    throw new Error('FleetDM instance configuration is not found');
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
   }
 
   await jobState.iterateEntities(Entities.USER, async (userEntity) => {
