@@ -13,6 +13,7 @@ import { createAPIClient } from '../../client';
 import { createPolicyEntity, getPolicyKey } from './converters';
 import { FleetDMInstanceConfig, FleetDMPolicy } from '../../types';
 import { getStepName } from '../../helpers';
+import { createInstanceEntityKey } from '../fetch-account/converters';
 
 export const fetchPoliciesSteps: IntegrationStep<IntegrationConfig>[] = [
   {
@@ -44,24 +45,34 @@ export async function fetchPolicies({
   instance,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const client = createAPIClient(instance.config, logger);
-  const fleetDMConfiguration =
+
+  const fleetDMInstance =
     await jobState.getData<FleetDMInstanceConfig>('fleetdmInstance');
-  const fleetDMEntity = await jobState.getData<Entity>('fleetdmEntity');
-  if (!fleetDMConfiguration || !fleetDMEntity) {
+  if (!fleetDMInstance) {
     throw new IntegrationMissingKeyError(
       'FleetDM instance configuration is not found',
     );
   }
+
+  const fleetDMInstanceEntity = await jobState.findEntity(
+    createInstanceEntityKey(fleetDMInstance),
+  );
+  if (!fleetDMInstanceEntity) {
+    throw new IntegrationMissingKeyError(
+      'FleetDM instance configuration is not found',
+    );
+  }
+
   /**
    * create policy entities
    */
   await client.iteratePolicies(async (policy) => {
     const policyEntity = await jobState.addEntity(
-      createPolicyEntity(policy, fleetDMConfiguration),
+      createPolicyEntity(policy, fleetDMInstance),
     );
     await jobState.addRelationship(
       createDirectRelationship({
-        from: fleetDMEntity,
+        from: fleetDMInstanceEntity,
         to: policyEntity,
         _class: RelationshipClass.HAS,
       }),

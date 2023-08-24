@@ -54,3 +54,6 @@ const capitalizeFirstChar = (str: string) => {
 export const getStepName = (step: (typeof Steps)[keyof typeof Steps]) => {
   return capitalizeFirstChar(step.split('-').join(' '));
 };
+
+export const urlToKey = (keyPart: string): string =>
+  keyPart.split(/[^a-zA-Z0-9]+/).join('-');

@@ -4,8 +4,7 @@ import {
 } from '@jupiterone/integration-sdk-core';
 import { Entities } from '../constants';
 import { FleetDMInstanceConfig } from '../../types';
-import { urlToKey } from '../../utils';
-import { createEntityKey } from '../../helpers';
+import { createEntityKey, urlToKey } from '../../helpers';
 
 export const createInstanceEntity = (
   fleetDMConfiguration: FleetDMInstanceConfig,
