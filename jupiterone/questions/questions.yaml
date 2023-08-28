@@ -2,15 +2,46 @@
 sourceId: managed:fleet-dm
 integrationDefinitionId: '${integration_definition_id}'
 questions:
-  []
-  # - id: integration-question-template-replace-me
-  #   title: What kinds of questions will this integration support?
-  #   description:
-  #     TODO Every integration should contribute questions! Please be careful
-  #     to replace this before deploying the integration to JupiterOne.
-  #   queries:
-  #     - name: good
-  #       query: |
-  #         find * with _integrationDefinitionId = '${integration_definition_id}'
-  #   tags:
-  #     - template
+  - id: managed-question-endpoint-fleetdm-devices-application
+    title:
+      What FleetDM managed end-user device has a specific application installed?
+    description:
+      Return a list of endpoint devices that have a specific application
+      installed.
+    queries:
+      - query: |
+          FIND fleetdm_instance AS f
+            THAT HAS user_endpoint AS ue
+            THAT INSTALLED Application WITH name ~= "Slack.app" AS a
+          RETURN
+            ue.displayName AS Device,
+            f.displayName AS FleetDMInstance,
+            ue.macAddress AS MacAddress,
+            ue.osVersion AS OSVersion,
+            a.displayName AS Application,
+            a.version AS Version
+    tags:
+      - application
+      - device
+      - endpoint
+      - fleetdm
+  - id: managed-question-endpoint-fleetdm-device-violates-policy
+    title: What FleetDM managed end-user device violates FleetDM policies?
+    description:
+      Return a list of endpoint devices that violate FleetDM policies.
+    queries:
+      - query: |
+          FIND fleetdm_policy AS p
+            THAT VIOLATES<< user_endpoint AS ue
+            THAT HAS<< fleetdm_instance AS f
+          RETURN
+            p.displayName AS Policy,
+            f.displayName AS FleetDMInstance,
+            ue.displayName AS Device,
+            ue.macAddress AS MacAddress,
+            ue.osVersion AS OSVersion
+    tags:
+      - device
+      - endpoint
+      - fleetdm
+      - policy
