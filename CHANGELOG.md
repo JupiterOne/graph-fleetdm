@@ -1,3 +1,16 @@
+# v0.1.1 (Mon Aug 28 2023)
+
+#### 🐛 Bug Fix
+
+- [NO-TICKET] add some sample questions [#6](https://github.com/JupiterOne/graph-fleetdm/pull/6) ([@ryan-willis](https://github.com/ryan-willis))
+- [NO-TICKET] fix questions step [#7](https://github.com/JupiterOne/graph-fleetdm/pull/7) ([@ryan-willis](https://github.com/ryan-willis))
+
+#### Authors: 1
+
+- Ryan Willis ([@ryan-willis](https://github.com/ryan-willis))
+
+---
+
 # v0.1.0 (Thu Aug 24 2023)
 
 #### 🚀 Enhancement
