@@ -1,0 +1,12 @@
+openapi: 3.0.1
+info:
+  title: '@jupiterone/graph-fleetdm'
+  description: An integration and graph conversion project for FleetDM
+  x-cortex-git:
+    github:
+      repository: JupiterOne/graph-fleetdm
+  x-cortex-owners:
+    - type: group
+      name: JupiterOne/integrations
+  x-cortex-service-groups: tier-4
+  x-cortex-tag: '@jupiterone/graph-fleetdm'

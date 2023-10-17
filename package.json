@@ -2,6 +2,10 @@
   "name": "@jupiterone/graph-fleetdm",
   "version": "0.1.1",
   "description": "An integration and graph conversion project for FleetDM",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JupiterOne/graph-fleetdm"
+  },
   "license": "MPL-2.0",
   "main": "src/index.js",
   "types": "src/index.d.ts",
